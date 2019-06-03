@@ -18,7 +18,6 @@ class CheckOut extends Component {
         for (let param of query.entries()) {
             ingredients[param[0]] = param[1]
         }
-        console.log(ingredients)
         this.setState({ ingredients: ingredients })
     }
 
@@ -31,6 +30,8 @@ class CheckOut extends Component {
     }
 
     render() {
+        console.log(this.props.match.path + '/contact-data')
+
         return (
             <div>
                 <CheckOutSummary
@@ -38,7 +39,7 @@ class CheckOut extends Component {
                     checkOutCanceled={this.checkOutCancelledHandler}
                     checkOutContinued={this.checkOutContinuedHandler}
                 />
-                <Route path={this.props.match.path + '/contact-data'} component={ContactData}/>
+                <Route path={this.props.match.path + '/contact-data'} exact component={ContactData}/>
             </div>
         )
     }
