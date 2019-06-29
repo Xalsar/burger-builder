@@ -1,4 +1,6 @@
 import React, { Component, Fragment } from 'react'
+import { connect } from 'react-redux'
+
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
@@ -6,6 +8,8 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
 import Spinner from '../../components/Spinner/Spinner'
 import withErrorHandler from '../hoc/withErrorHandler/withErrorHandler'
 import axios from '../../axios-order'
+// import { dispatch } from 'rxjs/internal/observable/range';
+import * as actionTypes from '../../store/actions'
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -16,7 +20,6 @@ const INGREDIENT_PRICES = {
 
 class BurgerBuilder extends Component {
     state = {
-        ingredients: null,
         totalPrice: 4,
         purchasable: false,
         purchasing: false,
@@ -25,20 +28,20 @@ class BurgerBuilder extends Component {
     }
 
     async componentDidMount() {
-        try {
-            // const response = await axios.get('https://react-my-burger-e133d.firebaseio.com/ingredients')
-            // console.log(response)
-        } catch (e) {
-            this.setState({ error: true })
-        }
-        this.setState({
-            ingredients: {
-                cheese: 0,
-                salad: 0,
-                meat: 0,
-                bacon: 0
-            }
-        })
+        // try {
+        //     // const response = await axios.get('https://react-my-burger-e133d.firebaseio.com/ingredients')
+        //     // console.log(response)
+        // } catch (e) {
+        //     this.setState({ error: true })
+        // }
+        // this.setState({
+        //     ingredients: {
+        //         cheese: 0,
+        //         salad: 0,
+        //         meat: 0,
+        //         bacon: 0
+        //     }
+        // })
     }
 
     updatePurchaseState(ingredients) {
@@ -51,10 +54,10 @@ class BurgerBuilder extends Component {
     }
 
     addIngredientHandler = (type) => {
-        const oldCount = this.state.ingredients[type]
+        const oldCount = this.props.ings[type]
         const updatedCount = oldCount + 1
         const updatedIngredients = {
-            ...this.state.ingredients
+            ...this.props.ings
         }
         updatedIngredients[type] = updatedCount
 
@@ -69,13 +72,13 @@ class BurgerBuilder extends Component {
     }
 
     removeIngredientHandler = (type) => {
-        const oldCount = this.state.ingredients[type]
+        const oldCount = this.props.ings[type]
         if (oldCount <= 0) {
             return
         }
         const updatedCount = oldCount - 1
         const updatedIngredients = {
-            ...this.state.ingredients
+            ...this.props.ings
         }
         updatedIngredients[type] = updatedCount
 
@@ -102,7 +105,7 @@ class BurgerBuilder extends Component {
         // this.setState({ loading: true })
 
         // const order = {
-        //     ingredients: this.state.ingredients,
+        //     ingredients: this.props.ings,
         //     price: this.state.totalPrice,
         //     customer: {
         //         name: 'Xavier Carrera',
@@ -123,8 +126,8 @@ class BurgerBuilder extends Component {
         //     this.setState({ loading: false, purchasing: false })
         // }
         const queryParams = []
-        for (let i in this.state.ingredients) {
-            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]))
+        for (let i in this.props.ings) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.props.ings[i]))
         }
         queryParams.push('price=' + this.state.totalPrice)
         const queryString = queryParams.join('&')
@@ -138,18 +141,18 @@ class BurgerBuilder extends Component {
         let burger = this.state.error ? <p>Ingredients can not be loaded</p> : <Spinner />
         let orderSummary = null
 
-        const disabledInfo = { ...this.state.ingredients }
+        const disabledInfo = { ...this.props.ings }
         for (const key in disabledInfo) {
             disabledInfo[key] = disabledInfo[key] <= 0
         }
 
-        if (this.state.ingredients) {
+        if (this.props.ings) {
             burger = (
                 <Fragment>
-                    <Burger ingredients={this.state.ingredients} />
+                    <Burger ingredients={this.props.ings} />
                     <BuildControls
-                        ingredientAdded={this.addIngredientHandler}
-                        ingredientRemoved={this.removeIngredientHandler}
+                        ingredientAdded={this.props.onIngredientAdded}
+                        ingredientRemoved={this.props.onIngredientRemoved}
                         disabled={disabledInfo}
                         purchasable={this.state.purchasable}
                         price={this.state.totalPrice}
@@ -158,7 +161,7 @@ class BurgerBuilder extends Component {
                 </Fragment>
             )
             orderSummary = <OrderSummary
-                ingredients={this.state.ingredients}
+                ingredients={this.props.ings}
                 price={this.state.totalPrice}
                 purchaseCanceled={this.purchaseCancelHandler}
                 purchaseContinued={this.purchaseContinueHandler}
@@ -179,4 +182,17 @@ class BurgerBuilder extends Component {
     }
 }
 
-export default withErrorHandler(BurgerBuilder, axios)
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients
+    }
+}
+
+const mapDisptachToProps = dispatch => {
+    return {
+        onIngredientAdded: (ingredientName) => dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName }),
+        onIngredientRemoved: (ingredientName) => dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName })
+    }
+}
+
+export default connect(mapStateToProps, mapDisptachToProps)(withErrorHandler(BurgerBuilder, axios))
