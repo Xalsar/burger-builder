@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { Route } from 'react-router-dom'
+import { connect } from 'react-redux'
 import CheckOutSummary from '../../components/Order/CheckOutSummary/CheckOutSummary'
 import Spinner from '../../../src/components/Spinner/Spinner'
 import ContactData from './ContactData/ContactData'
@@ -36,21 +37,18 @@ class CheckOut extends Component {
 
     render() {
         let checkOut = <Spinner />
-        if (this.state.ingredients) {
+        if (this.props.ings) {
             checkOut = (
                 <div>
                     <CheckOutSummary
-                        ingredients={this.state.ingredients}
+                        ingredients={this.props.ings}
                         checkOutCanceled={this.checkOutCancelledHandler}
                         checkOutContinued={this.checkOutContinuedHandler}
                     />
                     <Route
                         path={this.props.match.path + '/contact-data'}
                         exact
-                        render={(props) => (<ContactData
-                            ingredients={this.state.ingredients}
-                            {...props}
-                        />)}
+                        component={ContactData}
                         price={this.state.totalPrice}
                     />
                 </div>)
@@ -64,4 +62,11 @@ class CheckOut extends Component {
     }
 }
 
-export default CheckOut
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients,
+        price: state.totalPrice
+    }
+}
+
+export default connect(mapStateToProps)(CheckOut)
