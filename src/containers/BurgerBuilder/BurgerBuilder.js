@@ -9,7 +9,7 @@ import Spinner from '../../components/Spinner/Spinner'
 import withErrorHandler from '../hoc/withErrorHandler/withErrorHandler'
 import axios from '../../axios-order'
 // import { dispatch } from 'rxjs/internal/observable/range';
-import * as actionTypes from '../../store/actions'
+import * as burgerBuilderActions from '../../store/actions/index'
 
 class BurgerBuilder extends Component {
     state = {
@@ -20,6 +20,7 @@ class BurgerBuilder extends Component {
     }
 
     async componentDidMount() {
+        this.props.onInitIngredients()
         // try {
         //     // const response = await axios.get('https://react-my-burger-e133d.firebaseio.com/ingredients')
         //     // console.log(response)
@@ -130,7 +131,7 @@ class BurgerBuilder extends Component {
     }
 
     render() {
-        let burger = this.state.error ? <p>Ingredients can not be loaded</p> : <Spinner />
+        let burger = this.props.error ? <p>Ingredients can not be loaded</p> : <Spinner />
         let orderSummary = null
 
         const disabledInfo = { ...this.props.ings }
@@ -177,14 +178,16 @@ class BurgerBuilder extends Component {
 const mapStateToProps = state => {
     return {
         ings: state.ingredients,
-        price: state.totalPrice
+        price: state.totalPrice,
+        error: state.error
     }
 }
 
 const mapDisptachToProps = dispatch => {
     return {
-        onIngredientAdded: (ingredientName) => dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientName }),
-        onIngredientRemoved: (ingredientName) => dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientName })
+        onIngredientAdded: (ingredientName) => dispatch(burgerBuilderActions.addIngredient(ingredientName)),
+        onIngredientRemoved: (ingredientName) => dispatch(burgerBuilderActions.removeIngredient(ingredientName)),
+        onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients())
     }
 }
 
