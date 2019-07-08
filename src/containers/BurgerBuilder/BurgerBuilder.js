@@ -9,7 +9,7 @@ import Spinner from '../../components/Spinner/Spinner'
 import withErrorHandler from '../hoc/withErrorHandler/withErrorHandler'
 import axios from '../../axios-order'
 // import { dispatch } from 'rxjs/internal/observable/range';
-import * as burgerBuilderActions from '../../store/actions/index'
+import * as actions from '../../store/actions/index'
 
 class BurgerBuilder extends Component {
     state = {
@@ -94,7 +94,7 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = async () => {
-        console.log(this.props)
+        this.props.onInitPurchase()
         // this.setState({ loading: true })
 
         // const order = {
@@ -177,17 +177,18 @@ class BurgerBuilder extends Component {
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice,
-        error: state.error
+        ings: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        error: state.burgerBuilder.error
     }
 }
 
 const mapDisptachToProps = dispatch => {
     return {
-        onIngredientAdded: (ingredientName) => dispatch(burgerBuilderActions.addIngredient(ingredientName)),
-        onIngredientRemoved: (ingredientName) => dispatch(burgerBuilderActions.removeIngredient(ingredientName)),
-        onInitIngredients: () => dispatch(burgerBuilderActions.initIngredients())
+        onIngredientAdded: (ingredientName) => dispatch(actions.addIngredient(ingredientName)),
+        onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredient(ingredientName)),
+        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onInitPurchase: () => dispatch(actions.purchaseInit())
     }
 }
 
