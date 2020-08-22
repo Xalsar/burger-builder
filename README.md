@@ -1,6 +1,14 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Burger builder
+
+![Burger app screenshot](https://res.cloudinary.com/dk7vresyz/image/upload/v1598092825/repos/BurgerApp_rjfgnq.png)
+
+Burger builder project: Make your own burgers and crate orders. Download the code and run `yarn install && yarn start` to run the app.
+
+Some functionalityes may be linked to Google Cloud, so some minor parts of the app may not work properly.
 
 ## Available Scripts
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 In the project directory, you can run:
 
